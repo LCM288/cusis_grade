@@ -15,14 +15,7 @@ function getGradeDetails() {
       [...x.children].forEach((y, i) => (obj[titles[i]] = y.innerText));
       return obj;
     })
-    .filter(
-      x =>
-        x["status"] === "Taken" &&
-        parseInt(x["units"]) &&
-        x["grade"] !== "P" &&
-        x["grade"] !== "PP" &&
-        x["grade"] !== "FF"
-    )
+    .filter(x => x["status"] === "Taken" && parseInt(x["units"]))
     .map(x => {
       x["units"] = parseInt(x["units"]);
       return x;
@@ -94,6 +87,7 @@ function genGradeAnalyserPage() {
     displayBySelect.innerHTML = `
       <option disabled selected value> -- please select -- </option>
       <option value="all">All</option>
+      <option value="none">No grouping</option>
     `;
     const groupByValue = document.getElementById("groupBy").value;
     if (!groupByValue) {
@@ -178,38 +172,47 @@ function genGradeAnalyserPage() {
           values: new Array(distinguishByGroups.length).fill(0),
           labels: distinguishByGroups,
           type: "pie",
-          textinfo: "label+percent"
+          textinfo: "label+percent+value",
+          textposition: "outside",
+          automargin: true
         }
       ];
-      gradeDetails
-        .filter(classDetails =>
+      const filteredGradeDetails =
+        displayByValue === "none"
+          ? gradeDetails
+          : gradeDetails.filter(classDetails =>
+              checkBelongsToGroup(
+                classDetails,
+                groupByValue,
+                displayByValue,
+                groupByGroups
+              )
+            );
+      filteredGradeDetails.forEach(classDetails => {
+        const groupIndex = distinguishByGroups.findIndex(groupName =>
           checkBelongsToGroup(
             classDetails,
-            groupByValue,
-            displayByValue,
-            groupByGroups
+            distinguishByValue,
+            groupName,
+            distinguishByGroups
           )
-        )
-        .forEach(classDetails => {
-          const groupIndex = distinguishByGroups.findIndex(groupName =>
-            checkBelongsToGroup(
-              classDetails,
-              distinguishByValue,
-              groupName,
-              distinguishByGroups
-            )
-          );
-          if (groupIndex != -1) {
-            switch (calculateByValue) {
-              case "course":
-                plotData[0].values[groupIndex] += 1;
-                break;
-              case "credit":
-                plotData[0].values[groupIndex] += classDetails["units"];
-                break;
-            }
+        );
+        if (groupIndex != -1) {
+          switch (calculateByValue) {
+            case "course":
+              plotData[0].values[groupIndex] += 1;
+              break;
+            case "credit":
+              plotData[0].values[groupIndex] += classDetails["units"];
+              break;
           }
-        });
+        }
+      });
+      while (plotData[0].values.indexOf(0) != -1) {
+        const indexToRemove = plotData[0].values.indexOf(0);
+        plotData[0].values.splice(indexToRemove, 1);
+        plotData[0].labels.splice(indexToRemove, 1);
+      }
     }
     const layout = {
       autosize: true
