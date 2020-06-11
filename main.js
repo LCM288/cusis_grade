@@ -10,7 +10,7 @@ function getGradeDetails() {
     ...document.getElementsByClassName("ps_grid-body")[0].children
   ]
     .map(x => {
-      obj = new Object();
+      let obj = new Object();
       obj["subject"] = x.firstElementChild.innerText.slice(0, 4);
       [...x.children].forEach((y, i) => (obj[titles[i]] = y.innerText));
       return obj;
