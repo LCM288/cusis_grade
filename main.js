@@ -320,8 +320,8 @@ gradeAnalyserTabButton.innerHTML = `
     <div
       ptgpid="gradeAnalyser"
       onkeydown="cancelBubble(event);ptgpPage.stepKeyboardEventHandler(event, 'gradeAnalyser');"
-      onclick="clickGradeAnalyser()"
       class="ps_box-group psc_layout ps_ag-step-button ps_ag-step-first psc_visited"
+      id="gradeAnalyserTabButton"
     >
       <div class="ps_box-group psc_layout ps_ag-step-wrapper psc_nolabel psc_display-inlineblock">
         <div class="ps_box-group psc_layout ps_ag-step-main psc_display-inlineblock">
@@ -344,3 +344,6 @@ gradeAnalyserTabButton.innerHTML = `
 `;
 
 tabList.append(gradeAnalyserTabButton);
+document
+  .getElementById("gradeAnalyserTabButton")
+  .addEventListener("click", clickGradeAnalyser);
