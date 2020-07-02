@@ -38,6 +38,7 @@ function genGradeAnalyserPage() {
       "C-",
       "D+",
       "D",
+      "P",
       "F"
     ];
     let groups = gradeDetails
